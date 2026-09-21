@@ -14,7 +14,7 @@ echo "target: $URL  (host=$HOST port=$PORT)"
 
 echo -n "1. TCP  connect ...... "
 if (exec 3<>"/dev/tcp/$HOST/$PORT") 2>/dev/null; then echo "OK"; else
-  echo "FAIL"; echo "   -> $HOST:$PORT に繋がりません。サーバは起動していますか?(server で make status) 待受アドレス/FW/URL も確認。"; exit 1; fi
+  echo "FAIL"; echo "   -> $HOST:$PORT に繋がりません。サーバは起動していますか?(サーバ側の端末で make status) 待受アドレス/FW/URL も確認。"; exit 1; fi
 
 # 2 と 3 で使う本文。2026-07-28 プロトコルは params._meta と Mcp-Method ヘッダを要求する。
 BODY='{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}}}'

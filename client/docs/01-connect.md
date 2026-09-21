@@ -2,7 +2,7 @@
 
 ## 前提
 
-- サーバが起動している（`make server-status` / サーバ側で `make status` → `running`）
+- サーバが起動している（サーバを動かしている端末で `make status` → `running`）
 - `claude`（Claude Code）、`curl`、`make` が使える
 
 ## 手順
@@ -27,7 +27,7 @@ target: http://127.0.0.1:8848/mcp  (host=127.0.0.1 port=8848)
 => サーバに届いており、MCP として応答しています。次は make add で Claude に登録できます。
 ```
 
-3段階で「どこで詰まっているか」が一意に決まる（失敗時の対処は [`03-troubleshooting.md`](03-troubleshooting.md)）。
+3段階で「どこで詰まっているか」が一意に決まる（失敗時の対処は [`02-troubleshooting.md`](02-troubleshooting.md)）。
 
 ### 3. `make add` の期待出力（実測）
 
@@ -57,7 +57,8 @@ Claude Code 上のツール名は `mcp__ops-mcp__<ツール名>`（例: `mcp__op
 ### 実測: ヘッドレスで実際にツールを呼ばせた結果
 
 ```bash
-cd client && claude -p "ops-mcp のツールを使って、このホストのメモリ使用状況と、CPU使用率の高いプロセス上位3つを調べて、日本語で3行以内で報告して。" \
+# client/ ディレクトリで実行（local scope の登録はこのディレクトリに紐づく）
+claude -p "ops-mcp のツールを使って、このホストのメモリ使用状況と、CPU使用率の高いプロセス上位3つを調べて、日本語で3行以内で報告して。" \
   --allowedTools "mcp__ops-mcp__resource_usage,mcp__ops-mcp__top_processes"
 ```
 
@@ -123,4 +124,4 @@ claude mcp remove ops-mcp
 
 1. `client/` ディレクトリごとコピーする（要: `claude`・`curl`・`make`。Python は不要）
 2. `make config` → `config/endpoint.env` の `MCP_SERVER_URL` をサーバのアドレスにする
-3. 以降は同じ（`make check` → `make add`）。サーバ側の準備は [`02-remote-host.md`](02-remote-host.md)
+3. 以降は同じ（`make check` → `make add`）。サーバ側の準備は共有ドキュメント [`../../docs/10-remote-host.md`](../../docs/10-remote-host.md)

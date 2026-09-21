@@ -1,4 +1,5 @@
-# server/Makefile — ops-mcp サーバの操作窓口。`make help` で一覧。
+# server/Makefile — 【サーバ側】ops-mcp サーバの操作窓口。`make help` で一覧。
+# このディレクトリだけで自己完結する（client/ には依存しない）。
 # 依存管理と実行は uv。uv が PATH に無い場合は UV=/path/to/uv make ... で指定する。
 
 UV ?= uv
@@ -8,14 +9,21 @@ export UV
 MCP_URL ?= $(shell set -a; [ -f config/server.env ] && . ./config/server.env; echo "http://127.0.0.1:$${MCP_PORT:-8848}/mcp")
 
 .DEFAULT_GOAL := help
-.PHONY: help setup run start stop restart status logs smoke load test clean
+.PHONY: help setup up down run start stop restart status logs smoke load test clean
 
 help: ## ターゲット一覧
+	@echo "[SERVER 側] ops-mcp サーバの操作  ($(CURDIR))"
+	@echo "  ※ Claude Code（クライアント）側の操作は client/ ディレクトリで行う"
+	@echo
 	@grep -hE '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*## "}{printf "  %-9s %s\n",$$1,$$2}'
 
 setup: ## uv で .venv を作り依存を導入（config/server.env も用意）
 	$(UV) sync
 	@[ -f config/server.env ] || { cp config/server.env.example config/server.env; echo "created config/server.env"; }
+
+up: setup start ## 導入して起動（setup + start）
+
+down: stop ## 停止（stop の別名）
 
 run: ## フォアグラウンドで起動（Ctrl-C で停止）
 	@scripts/serverctl.sh run

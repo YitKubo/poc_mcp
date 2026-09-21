@@ -51,14 +51,14 @@ ERROR    unexpected error in <tool>  + traceback               ← 想定外の�
 ## よくある変更
 
 ### ポートを変える
-`config/server.env` の `MCP_PORT` を変えて `make restart`。クライアント側の URL（`client/config/endpoint.env`）も合わせる。
+`config/server.env` の `MCP_PORT` を変えて `make restart`。クライアント側の接続先 URL も同じポートに合わせる。
 
 ### 別マシンから繋がせる
 1. `config/server.env`: `MCP_HOST=0.0.0.0` と `MCP_ALLOWED_HOSTS=<サーバのIP>`
 2. `make restart`（`run/server.log` に `WARNING listening on 0.0.0.0 ... NO authentication` が出る）
 3. クライアント側の URL をサーバの IP にする
 
-**`MCP_ALLOWED_HOSTS` を忘れると全リクエストが `421 Misdirected Request` になる**（再現・診断は [`../../client/docs/02-remote-host.md`](../../client/docs/02-remote-host.md)）。
+**`MCP_ALLOWED_HOSTS` を忘れると全リクエストが `421 Misdirected Request` になる**（再現・診断は [`../../docs/10-remote-host.md`](../../docs/10-remote-host.md)）。
 認証が無いので、信頼できる LAN 内に限ること。WSL2 の IP は再起動で変わる。
 
 ### キャッシュを切る / 変える

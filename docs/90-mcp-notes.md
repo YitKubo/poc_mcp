@@ -62,7 +62,7 @@ SSE は Streamable HTTP に置き換えられた旧方式で、新規には使�
 
 ## 6. 覚えておく用語・落とし穴
 
-- **DNS リバインド保護 / Host allowlist**: 既定で localhost 以外の Host を拒否。外へ開くと全リクエストが `421 Misdirected Request`（→ [`client/docs/02-remote-host.md`](../client/docs/02-remote-host.md)）
+- **DNS リバインド保護 / Host allowlist**: 既定で localhost 以外の Host を拒否。外へ開くと全リクエストが `421 Misdirected Request`（→ [`10-remote-host.md`](10-remote-host.md)）
 - **single-flight**: 同じ計測が実行中なら、後続は待って結果を共有する。TTL キャッシュは「時間方向」、single-flight は「同時方向」の重複排除
 - **バックプレッシャの明示**: 溢れた要求は無限に待たせず、モデルが読めるエラーで断る
 - **`local` scope**: 登録時のディレクトリに紐づく。別ディレクトリで `claude` を起動すると見えない

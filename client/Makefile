@@ -1,10 +1,14 @@
-# client/Makefile — MCP クライアント（Claude Code）側の操作窓口。`make help` で一覧。
+# client/Makefile — 【クライアント側】MCP クライアント（Claude Code）側の操作窓口。`make help` で一覧。
+# このディレクトリだけで自己完結する（server/ には依存しない）。
 # このディレクトリ一式を別端末にコピーすれば、そこからでも同じ手順で接続できる（要: claude, curl, make）。
 
 .DEFAULT_GOAL := help
 .PHONY: help config check add remove reset list show
 
 help: ## ターゲット一覧
+	@echo "[CLIENT 側] MCP サーバへの接続操作（Claude Code）  ($(CURDIR))"
+	@echo "  ※ サーバの起動・停止は server/ ディレクトリで行う"
+	@echo
 	@grep -hE '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*## "}{printf "  %-8s %s\n",$$1,$$2}'
 
 config: ## config/endpoint.env を作る（接続先はここで編集）

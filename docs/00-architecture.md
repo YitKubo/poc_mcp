@@ -41,7 +41,7 @@ flowchart LR
 ```
 
 同じホスト上の**別プロセス同士が HTTP で会話している**のがポイント。
-接続先の URL とサーバの待受アドレスを変えれば、そのまま別マシンへ広げられる（[`client/docs/02-remote-host.md`](../client/docs/02-remote-host.md)）。
+接続先の URL とサーバの待受アドレスを変えれば、そのまま別マシンへ広げられる（[`10-remote-host.md`](10-remote-host.md)）。
 
 ## 2. stdio との対比（MCP を理解する一番のポイント）
 
@@ -71,7 +71,7 @@ sequenceDiagram
   participant C as Claude Code<br/>(MCP クライアント)
   participant S as ops-mcp<br/>(MCPServer)
   participant K as psutil / systemd
-  U->>C: make client-add（claude mcp add --transport http）
+  U->>C: cd client && make add（claude mcp add --transport http）
   Note over C,S: 新しいセッション起動時に接続し、<br/>プロトコル版と capabilities をやり取りする
   C->>S: tools/list
   S-->>C: 9 tools（すべて read_only_hint=true）
@@ -160,17 +160,18 @@ flowchart LR
 
 ```
 poc_mcp/
-├── Makefile, README.md      入口
-├── docs/                    両者共通（このファイル, 90-mcp-notes.md）
-├── server/                  サーバ側だけで自己完結: 「何を公開し、どう動かすか」
+├── README.md                入口（Makefile は置かない。操作は server/ か client/ に入って行う）
+├── docs/                    両側にまたがるもの: 00-architecture.md（このファイル）, 10-remote-host.md, 90-mcp-notes.md
+├── server/                  【サーバ側】自己完結・独自の Makefile: 「何を公開し、どう動かすか」
 │   ├── server.py            MCPServer 定義・起動
 │   ├── ops/                 collectors.py（OS から集める）/ concurrency.py（並行制御）
 │   ├── config/  scripts/  docs/  Makefile  pyproject.toml
-└── client/                  クライアント側だけで自己完結: 「どこに繋ぎ、どう登録するか」
+└── client/                  【クライアント側】自己完結・独自の Makefile: 「どこに繋ぎ、どう登録するか」
     └── config/  scripts/  docs/  Makefile        （Python 不要。要: claude, curl, make）
 ```
 
-- `server/` にクライアントの都合は書かない。`client/` にサーバ実装の詳細は書かない。
+- `server/` と `client/` は**互いを参照しない独立した単位**（各々に Makefile・README・docs）。操作は必ずどちらかのディレクトリに入って行う。
+- 両側にまたがる手順（別マシンへ広げる等）だけを共有の `docs/` に置き、見出しで【サーバ側】/【クライアント側】を明記する。
 - 両者の共有事項（エンドポイント `/mcp`、トランスポート、ツール名）は本ファイルが正。
 - `client/` 一式は、別端末にコピーして `MCP_SERVER_URL` を書き換えれば同じ手順で使える。
 
@@ -182,7 +183,7 @@ poc_mcp/
 | コマンド注入 | `subprocess` は `shell=False` + 引数配列。ユニット名は `^[A-Za-z0-9][A-Za-z0-9@.:_\-]{0,127}$`（先頭 `-` 禁止でオプション注入も防ぐ） |
 | パストラバーサル | ログは**許可リストのキー**でのみ指定。パス文字列を受け取らない |
 | 待受アドレス | 既定 `127.0.0.1`。外に開くには `MCP_HOST` と `MCP_ALLOWED_HOSTS` の両方が必要 |
-| DNS リバインド | SDK 既定の Host allowlist（localhost）。外に開くときは明示（[`client/docs/02-remote-host.md`](../client/docs/02-remote-host.md)） |
+| DNS リバインド | SDK 既定の Host allowlist（localhost）。外に開くときは明示（[`10-remote-host.md`](10-remote-host.md)） |
 | 認証 | **なし**。ローカル/LAN 内のトライアル専用。公開するなら SDK の `run/authorization` を参照 |
 | エラー内容 | 想定外の例外は一般化してクライアントへ返し、詳細はサーバログだけに残す |
 | **ログ本文は外部入力** | syslog / journal には外部由来のテキストが入りうる。モデルに渡る**プロンプトインジェクションの経路**になりうるので、Claude が書き込み可能な他のツール（他の MCP や Bash 等）を持つセッションでは扱いに注意。制御文字（ANSI エスケープ等）は除去している |
@@ -198,3 +199,4 @@ poc_mcp/
 | 既定の待受は `127.0.0.1` | 認証がないので、外に開くのは明示的な操作に限る |
 | Windows を挟まず Linux ↔ Linux | ファイアウォール・PowerShell 等 MCP と無関係な障害を排除し、MCP の理解に集中するため |
 | 依存管理は uv、操作は make | 再現性（`uv.lock`）と、コマンドの入口の一本化 |
+| **ルートに Makefile を置かない** | `server-*` / `client-*` を中継すると、どちらの操作か曖昧になる。ディレクトリに入る＝側が決まる、にする。各 `make help` の先頭にも `[SERVER 側]` / `[CLIENT 側]` を表示 |
