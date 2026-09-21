@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# poc_mcp: local runtime config (copy from *.env.example) and logs
+server/config/server.env
+client/config/endpoint.env
+server/run/
+*.log
